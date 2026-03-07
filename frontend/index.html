@@ -3,240 +3,185 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>AI Chatbot</title>
-
-<!-- Markdown Parser -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
+<title>🥗 Diet Chatbot</title>
 <style>
+  body {
+    font-family: 'Arial', sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-*{
-box-sizing:border-box;
-font-family:Segoe UI, sans-serif;
-}
+  h1 {
+    margin-top: 20px;
+    color: #333;
+    text-align: center;
+  }
 
-body{
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:linear-gradient(135deg,#667eea,#764ba2);
-}
+  #chat-container {
+    width: 90%;
+    max-width: 500px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
-/* Main container */
+  #chatbox {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    height: 400px;
+  }
 
-#app{
-width:90%;
-max-width:800px;
-height:85vh;
-background:white;
-border-radius:12px;
-display:flex;
-flex-direction:column;
-box-shadow:0 15px 40px rgba(0,0,0,0.2);
-overflow:hidden;
-}
+  .message {
+    margin-bottom: 15px;
+    line-height: 1.6;
+  }
 
-/* Header */
+  .user {
+    text-align: right;
+  }
 
-.header{
-background:#111;
-color:white;
-padding:15px;
-text-align:center;
-font-weight:bold;
-font-size:18px;
-}
+  .user .bubble {
+    display: inline-block;
+    background: #4f9cff;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 15px 15px 0 15px;
+    max-width: 80%;
+    word-wrap: break-word;
+  }
 
-/* Messages */
+  .bot {
+    text-align: left;
+  }
 
-#messages{
-flex:1;
-padding:20px;
-overflow-y:auto;
-background:#f6f7fb;
-}
+  .bot .bubble {
+    display: inline-block;
+    background: #e0f7ea;
+    color: #333;
+    padding: 12px 15px;
+    border-radius: 15px 15px 15px 0;
+    max-width: 100%;
+    word-wrap: break-word;
+  }
 
-/* Chat bubble */
+  .bot b {
+    display: block;
+    margin-bottom: 5px;
+  }
 
-.msg{
-max-width:80%;
-padding:12px 16px;
-margin-bottom:15px;
-border-radius:10px;
-line-height:1.6;
-animation:fade .3s ease;
-}
+  ul {
+    padding-left: 20px;
+    margin: 0 0 10px 0;
+  }
 
-/* user */
+  li {
+    margin-bottom: 5px;
+  }
 
-.user{
-background:#4c6ef5;
-color:white;
-margin-left:auto;
-}
+  #input-container {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    background: #f9f9f9;
+  }
 
-/* bot */
+  #userInput {
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
 
-.bot{
-background:white;
-border:1px solid #ddd;
-}
+  #sendBtn {
+    padding: 10px 20px;
+    margin-left: 10px;
+    background: #4f9cff;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+  }
 
-/* Input area */
-
-#input-area{
-display:flex;
-padding:15px;
-border-top:1px solid #ddd;
-gap:10px;
-background:white;
-}
-
-#userInput{
-flex:1;
-padding:12px;
-border-radius:8px;
-border:1px solid #ccc;
-font-size:15px;
-outline:none;
-}
-
-button{
-padding:12px 18px;
-border:none;
-border-radius:8px;
-background:#4c6ef5;
-color:white;
-font-weight:bold;
-cursor:pointer;
-transition:.2s;
-}
-
-button:hover{
-background:#364fc7;
-}
-
-/* animation */
-
-@keyframes fade{
-from{opacity:0;transform:translateY(5px);}
-to{opacity:1;transform:translateY(0);}
-}
-
-pre{
-background:#111;
-color:#0f0;
-padding:10px;
-border-radius:6px;
-overflow:auto;
-}
-
-code{
-font-family:monospace;
-}
-
+  #sendBtn:hover { background: #3578e5; }
 </style>
 </head>
-
 <body>
 
-<div id="app">
+<h1>🥗 Diet Recommendation Chatbot</h1>
 
-<div class="header">
-AI Assistant
-</div>
-
-<div id="messages"></div>
-
-<div id="input-area">
-<input id="userInput" placeholder="Ask something..." />
-<button onclick="sendMessage()">Send</button>
-</div>
-
+<div id="chat-container">
+  <div id="chatbox"></div>
+  <div id="input-container">
+    <input type="text" id="userInput" placeholder="Ask about diet...">
+    <button id="sendBtn">Send</button>
+  </div>
 </div>
 
 <script>
-
+const chatbox = document.getElementById("chatbox");
 const input = document.getElementById("userInput");
-const messages = document.getElementById("messages");
+const sendBtn = document.getElementById("sendBtn");
 
-/* Enter key send */
+sendBtn.addEventListener("click", sendMessage);
+input.addEventListener("keydown", (e) => { if(e.key === "Enter") sendMessage(); });
 
-input.addEventListener("keypress", function(e){
-if(e.key==="Enter") sendMessage();
-});
+async function sendMessage() {
+  const message = input.value.trim();
+  if (!message) return;
 
-/* send message */
+  // User bubble
+  chatbox.innerHTML += `<div class="message user"><div class="bubble"><b>You:</b><br>${message}</div></div>`;
+  chatbox.scrollTop = chatbox.scrollHeight;
+  input.value = "";
 
-async function sendMessage(){
+  try {
+    const response = await fetch("http://localhost:3000/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message })
+    });
 
-const text = input.value.trim();
-if(!text) return;
+    const data = await response.json();
 
-appendMessage(text,"user");
-input.value="";
+    // Format bot response with proper line breaks and lists
+    const lines = data.reply.split("<br>");
+    let formatted = "";
+    let currentList = [];
 
-const loading = appendMessage("Thinking...","bot");
+    lines.forEach(line => {
+      line = line.trim();
+      if(line.startsWith("- ")) {
+        currentList.push(line.slice(2));
+      } else {
+        if(currentList.length > 0) {
+          formatted += "<ul>" + currentList.map(item => `<li>${item}</li>`).join("") + "</ul>";
+          currentList = [];
+        }
+        formatted += `<b>${line}</b><br>`;
+      }
+    });
+    if(currentList.length > 0) {
+      formatted += "<ul>" + currentList.map(item => `<li>${item}</li>`).join("") + "</ul>";
+    }
 
-try{
+    chatbox.innerHTML += `<div class="message bot"><div class="bubble">${formatted}</div></div>`;
+    chatbox.scrollTop = chatbox.scrollHeight;
 
-const response = await fetch("https://educational-assistant-chatbot-2qq4.vercel.app/chat",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({message:text})
-});
-
-const data = await response.json();
-
-loading.remove();
-
-appendMarkdown(data.reply,"bot");
-
-}catch(err){
-
-loading.remove();
-appendMessage("Server error.","bot");
-
+  } catch(err) {
+    chatbox.innerHTML += `<div class="message bot"><div class="bubble">AI service unavailable.</div></div>`;
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
 }
-
-}
-
-/* normal message */
-
-function appendMessage(text,type){
-
-const div=document.createElement("div");
-
-div.className="msg "+type;
-div.textContent=text;
-
-messages.appendChild(div);
-messages.scrollTop=messages.scrollHeight;
-
-return div;
-}
-
-/* markdown message */
-
-function appendMarkdown(text,type){
-
-const div=document.createElement("div");
-
-div.className="msg "+type;
-
-div.innerHTML=marked.parse(text);
-
-messages.appendChild(div);
-
-messages.scrollTop=messages.scrollHeight;
-
-}
-
 </script>
 
 </body>
